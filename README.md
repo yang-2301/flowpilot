@@ -1,5 +1,9 @@
 # FlowPilot
 
+![Architecture](docs/architecture.svg)
+
+![A FlowPilot run: five steps executed in order with per-step output](docs/ui-demo.png)
+
 **A config-driven automation engine: webhook/interval triggers, HTTP/LLM/transform/condition steps, retries with exponential backoff, dead-lettered run history and one-click replay.**
 
 The third piece of a three-repo portfolio ([docmind-rag](https://github.com/jeffyang-ai/docmind-rag) · [triagedesk](https://github.com/jeffyang-ai/triagedesk)). This one demonstrates the systems skills the other two don't: idempotent execution, retry semantics, observability, and the operational discipline that keeps a workflow engine from lying to you.
