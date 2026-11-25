@@ -1,8 +1,7 @@
 """FlowPilot API: management (admin token), webhook triggers, demo endpoints."""
-import hashlib
 import json
 import secrets
-import urllib.error
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,11 +13,20 @@ from .engine import validate_steps
 from .models import init_db, SessionLocal, Workflow, Run, now_iso
 from .scheduler import Scheduler, execute_run
 
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    init_db()
+    scheduler.start()
+    yield
+    scheduler.stop()
+
+
 app = FastAPI(
     title="FlowPilot API",
-    version="1.0.0",
+    version="1.1.0",
     description="Config-driven automation engine: webhook/interval triggers, "
                 "HTTP/LLM/transform/condition steps, retries with backoff, run log with replay.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -28,17 +36,6 @@ app.add_middleware(
 )
 
 scheduler = Scheduler()
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    init_db()
-    scheduler.start()
-
-
-@app.on_event("shutdown")
-def on_shutdown() -> None:
-    scheduler.stop()
 
 
 def get_db():

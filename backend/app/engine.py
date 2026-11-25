@@ -9,6 +9,7 @@ Step types:
 Every step result lands in context["steps"][<name>] = {"output": ..., "status": ...}.
 """
 import json
+import random
 import time
 import urllib.request
 import urllib.error
@@ -27,9 +28,11 @@ class StepFailure(Exception):
 
 
 def _sleep_backoff(attempt: int) -> None:
-    # Exponential with jitter; short in demos (base 1.5s).
+    # Exponential with full jitter (README documents "jittered backoff"):
+    # randomising the delay prevents thundering-herd retries when many runs
+    # fail against the same endpoint at once. Capped at 10s.
     delay = BACKOFF_BASE_SECONDS * (2 ** (attempt - 1))
-    time.sleep(min(delay, 10))
+    time.sleep(random.uniform(0, min(delay, 10)))
 
 
 def _http_request(step: Mapping[str, Any], context: Mapping[str, Any]) -> Any:

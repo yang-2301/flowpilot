@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { api } from "../api";
-import type { Run } from "../types";
+import type { Run, Workflow } from "../types";
 
 const router = useRouter();
 const runs = ref<Run[]>([]);
+const workflows = ref<Workflow[]>([]);
 const loading = ref(true);
 const error = ref("");
 const statusFilter = ref("");
@@ -13,8 +14,16 @@ const statusFilter = ref("");
 async function load() {
   loading.value = true;
   try {
-    const qs = statusFilter.value ? `?status=${statusFilter.value}` : "";
-    runs.value = await api.get<Run[]>(`/api/runs${qs}&page_size=50`);
+    // Build the query string in one place: an empty filter used to produce
+    // `/api/runs&page_size=50` (404) — params must never be concatenated blind.
+    const params = new URLSearchParams({ page_size: "50" });
+    if (statusFilter.value) params.set("status", statusFilter.value);
+    const [runsData, wfData] = await Promise.all([
+      api.get<Run[]>(`/api/runs?${params}`),
+      api.get<Workflow[]>("/api/workflows"),
+    ]);
+    runs.value = runsData;
+    workflows.value = wfData;
   } catch (e: any) {
     error.value = e.message;
   } finally {
@@ -22,6 +31,16 @@ async function load() {
   }
 }
 onMounted(load);
+
+const wfNameById = computed(() => {
+  const map: Record<string, string> = {};
+  for (const wf of workflows.value) map[wf.id] = wf.name;
+  return map;
+});
+
+function wfName(id: string): string {
+  return wfNameById.value[id] ?? id.slice(0, 8);
+}
 </script>
 
 <template>
@@ -51,7 +70,7 @@ onMounted(load);
             {{ r.id }}
             <span v-if="r.replay_of" class="muted">replay of {{ r.replay_of.slice(0, 6) }}</span>
           </td>
-          <td class="mono muted">{{ r.workflow_id }}</td>
+          <td>{{ wfName(r.workflow_id) }}</td>
           <td><span class="badge" :class="'status-' + r.status">{{ r.status }}</span></td>
           <td class="muted">{{ r.started_at.slice(11, 19) }} UTC</td>
           <td class="muted">{{ r.finished_at ? r.finished_at.slice(11, 19) : "—" }}</td>

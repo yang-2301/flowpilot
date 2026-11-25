@@ -62,7 +62,7 @@ class Scheduler:
 def execute_run(db, workflow: Workflow, payload: dict,
                 replay_of: Optional[str] = None) -> Run:
     """Create a Run row and execute the workflow's steps synchronously."""
-    from .engine import StepFailure, validate_steps
+    from .engine import run_steps
 
     run = Run(id=new_uuid(), workflow_id=workflow.id,
               trigger_payload=json.dumps(payload), status="running",

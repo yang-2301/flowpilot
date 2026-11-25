@@ -2,11 +2,15 @@
 
 ![Architecture](docs/architecture.svg)
 
-![A FlowPilot run: five steps executed in order with per-step output](docs/ui-demo.png)
+| Workflows console | Runs across all statuses |
+| --- | --- |
+| ![FlowPilot workflows console: step chips with retry budgets, webhook URLs, recent runs](docs/screenshots/workflows.png) | ![Runs list filtered by workflow name and status](docs/screenshots/runs.png) |
+| **Retry timeline: failed 3× then ok on attempt 4** | **Dead-lettered run, replayable with original payload** |
+| ![Run detail: flaky endpoint retried, 4 attempts, then success](docs/screenshots/run-detail-retries.png) | ![Dead run after retries exhausted, one-click replay](docs/screenshots/run-dead-replay.png) |
 
 **A config-driven automation engine: webhook/interval triggers, HTTP/LLM/transform/condition steps, retries with exponential backoff, dead-lettered run history and one-click replay.**
 
-The third piece of a three-repo portfolio ([docmind-rag](https://github.com/jeffyang-ai/docmind-rag) · [triagedesk](https://github.com/jeffyang-ai/triagedesk)). This one demonstrates the systems skills the other two don't: idempotent execution, retry semantics, observability, and the operational discipline that keeps a workflow engine from lying to you.
+The third piece of a three-repo portfolio ([docmind-rag](https://github.com/yang-2301/docmind-rag) · [triagedesk](https://github.com/yang-2301/triagedesk)). This one demonstrates the systems skills the other two don't: idempotent execution, retry semantics, observability, and the operational discipline that keeps a workflow engine from lying to you.
 
 ## What it does
 
@@ -82,4 +86,4 @@ Then open the console, hit **Fire test event** on the retry demo, and watch the 
 
 ---
 
-Part of my portfolio: [docmind-rag](https://github.com/jeffyang-ai/docmind-rag) (retrieval with citations + evaluation harness) and [triagedesk](https://github.com/jeffyang-ai/triagedesk) (full-stack AI support desk). I build automation that survives contact with production.
+Part of my portfolio: [docmind-rag](https://github.com/yang-2301/docmind-rag) (retrieval with citations + evaluation harness) and [triagedesk](https://github.com/yang-2301/triagedesk) (full-stack AI support desk). I build automation that survives contact with production.
